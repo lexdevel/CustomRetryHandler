@@ -6,7 +6,7 @@ namespace CustomRetryHandler
     /// <summary>
     /// The error detection strategy.
     /// </summary>
-    public class ErrorDetectionStrategy : ITransientErrorDetectionStrategy
+    public class TransientErrorDetectionStrategy : ITransientErrorDetectionStrategy
     {
         #region ITransientErrorDetectionStrategy implementation
 
@@ -17,13 +17,7 @@ namespace CustomRetryHandler
         /// <returns>True if success, false otherwise.</returns>
         public bool IsTransient(Exception exception)
         {
-            if (exception is RetryException)
-            {
-                // Console.WriteLine($"Retrying attempt { (exception as RetryException).CurrentRetry }");
-                return true;
-            }
-
-            return false;
+            return exception is RetryException;
         }
 
         #endregion

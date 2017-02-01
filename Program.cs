@@ -17,9 +17,14 @@ namespace CustomRetryHandler
         internal static readonly int RetryCount = 4;
 
         /// <summary>
+        /// The retry handler.
+        /// </summary>
+        internal static RetryHandler RetryHandler = new RetryHandler(new RetryPolicy(new TransientErrorDetectionStrategy(), RetryCount));
+
+        /// <summary>
         /// The http client.
         /// </summary>
-        internal static readonly HttpClient httpClient = new HttpClient(new RetryHandler(new RetryPolicy(new ErrorDetectionStrategy(), RetryCount)));
+        internal static readonly HttpClient HttpClient = new HttpClient(RetryHandler);
 
         /// <summary>
         /// The request url for making http calls.
@@ -31,29 +36,26 @@ namespace CustomRetryHandler
         /// <summary>
         /// Application entry point.
         /// </summary>
-        /// <param name="args">The command-line arguments.</param>
-        internal static void Main(string[] args)
+        internal static void Main()
         {
-            httpClient.Timeout = TimeSpan.FromSeconds(4);
+            HttpClient.Timeout = TimeSpan.FromSeconds(4);
 
             try
             {
                 using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, RequestUrl))
-                using (var response = httpClient.SendAsync(httpRequestMessage).GetAwaiter().GetResult())
+                using (HttpClient.SendAsync(httpRequestMessage).GetAwaiter().GetResult())
                 {
                     Console.WriteLine("OK");
                 }
             }
             catch (Exception exception)
             {
-                if (exception is RetryException)
-                {
-                    Console.WriteLine($"Error: maximum retry count reached ({ (exception as RetryException).CurrentRetry } of { RetryCount })");
-                }
-                else
-                {
-                    Console.WriteLine($"Error: { exception.Message }");
-                }
+                var retryException = exception as RetryException;
+                var errorMessage = retryException != null
+                    ? $"Error: maximum retry count reached ({retryException.CurrentRetry} of {RetryCount})"
+                    : $"Error: {exception.Message}";
+
+                Console.WriteLine($"Error: {errorMessage}");
             }
         }
     }

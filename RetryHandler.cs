@@ -64,11 +64,15 @@ namespace CustomRetryHandler
                     {
                         throw new RetryException(currentRetry);
                     }
-                    throw exception;
+                    throw;
                 }
-            } /*, cancellationToken (Do not pass the cancellation token here...) */).ConfigureAwait(false);
+            }, CancellationToken.None /* cancellationToken (Do not pass the cancellation token here...) */).ConfigureAwait(false);
 
-            return httpResponseMessage ?? throw new Exception("Fatal error.");
+            if (httpResponseMessage == null)
+            {
+                throw new Exception("Fatal error.");
+            }
+            return httpResponseMessage;
         }
 
         #endregion
