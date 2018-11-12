@@ -22,7 +22,7 @@ namespace CustomRetryHandler
         /// <param name="currentRetry">The current retry count.</param>
         public RetryException(int currentRetry)
         {
-            this.CurrentRetry = currentRetry;
+            CurrentRetry = currentRetry;
         }
     }
 }

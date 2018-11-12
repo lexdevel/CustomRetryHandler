@@ -26,7 +26,7 @@ namespace CustomRetryHandler
         /// <param name="retryPolicy">The retry policy.</param>
         public RetryHandler(RetryPolicy retryPolicy)
         {
-            this.Policy = retryPolicy;
+            Policy = retryPolicy;
         }
 
         #region Overrides
@@ -42,7 +42,7 @@ namespace CustomRetryHandler
             var httpResponseMessage = null as HttpResponseMessage;
             var currentRetry = 0;
 
-            this.Policy.Retrying += (sender, args) => currentRetry = args.CurrentRetryCount;
+            Policy.Retrying += (sender, args) => currentRetry = args.CurrentRetryCount;
 
             await this.Policy.ExecuteAsync(async () =>
             {
@@ -53,7 +53,7 @@ namespace CustomRetryHandler
                     httpResponseMessage = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
                     if (!httpResponseMessage.IsSuccessStatusCode)
                     {
-                        throw new HttpRequestException($"HTTP call failed with status code { httpResponseMessage.StatusCode.ToString() }");
+                        throw new HttpRequestException($"HTTP call failed with status code {httpResponseMessage.StatusCode.ToString()}");
                     }
 
                     return httpResponseMessage;
